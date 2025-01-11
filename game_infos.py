@@ -24,6 +24,13 @@ def extract_team_names(table: BeautifulSoup) -> List[str]:
     return [header.text.strip() for header in table.find_all("h3", class_="headline")]
 
 
+def extract_league_name(soup: BeautifulSoup) -> str:
+    """Extracts league name from the soup."""
+    return soup.find(
+        "h1", class_="truncate headline text-xl font-semibold"
+    ).text.strip()
+
+
 def determine_card(content: str) -> Optional[str]:
     """Determines the card type from SVG content."""
     if YELLOW_REGEX.search(content):
@@ -42,7 +49,10 @@ def extract_team_data(table: BeautifulSoup) -> pd.DataFrame:
         if len(cols) > 0:
             player_number = cols[0].text.strip().rstrip(".")
             player_name = cols[1].text.strip()
-            goals = cols[2].text.strip() or "0"
+            if len(cols) > 2:
+                goals = cols[2].text.strip() or "0"
+            else:
+                goals = "0"
             if len(cols) > 3:
                 two_min_penalties = cols[3].text.strip() or "0"
             else:
@@ -56,7 +66,7 @@ def extract_team_data(table: BeautifulSoup) -> pd.DataFrame:
                     "number": player_number,
                     "name": player_name,
                     "goals": goals,
-                    "two-min": two_min_penalties,
+                    "two_min": two_min_penalties,
                     "card": cards,
                 }
             )
@@ -95,8 +105,7 @@ def extract_game_date(soup: BeautifulSoup) -> datetime:
 def get_game_info(url: str) -> pd.DataFrame:
     """Extracts game info and returns it as a DataFrame."""
     soup = get_soup(url)
-
-    # Extract game metadata
+    league_name = extract_league_name(soup)
 
     # Extract teams and players
     table = soup.find("div", {"id": "aufstellung"})
@@ -106,6 +115,7 @@ def get_game_info(url: str) -> pd.DataFrame:
     team_tables = table.find_all("table")
     if len(team_tables) < 2:
         return pd.DataFrame()
+
     team_1_data = extract_team_data(team_tables[0])
     team_2_data = extract_team_data(team_tables[1])
     team_1_data["team"] = team_names[0]
@@ -113,10 +123,11 @@ def get_game_info(url: str) -> pd.DataFrame:
     game_data = pd.concat([team_1_data, team_2_data], axis=0)
     game_data["goals"] = game_data["goals"].astype(int)
     game_data["team"] = game_data["team"].astype(str)
-    game_data["two-min"] = game_data["two-min"].astype(int)
+    game_data["two_min"] = game_data["two_min"].astype(int)
     game_data["card"] = game_data["card"].astype(str)
     game_data["date"] = game_date
     game_data["game_id"] = url.split("/")[-1]
     game_data["league_id"] = url.split("/")[-3]
+    game_data["league_name"] = league_name
 
     return game_data
