@@ -38,3 +38,4 @@ build/
 *.orig
 *.rej
 *.sublime-*
+.DS_Store

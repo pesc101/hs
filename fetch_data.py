@@ -4,9 +4,9 @@ import pandas as pd
 from sqlalchemy import Engine
 from tqdm import tqdm
 
-from game_infos import get_game_info
-from init_db import create_db_engine
-from league_infos import get_game_urls, get_league_urls
+from app.db import create_db_engine
+from data.game_infos import get_game_info
+from data.league_infos import get_game_urls, get_league_urls
 
 
 def fetch_game_data(
