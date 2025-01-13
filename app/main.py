@@ -14,10 +14,10 @@ app = FastAPI()
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080"],  # Allow the Vue app (localhost:8080)
+    allow_origins=["http://127.0.0.1:8080"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -27,6 +27,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@app.get("/")
+def read_root():
+    return {
+        "message": "Welcome to the Handball Statistiken API!",
+        "docs_url": "/docs",
+        "status": "OK",
+        "version": "1.0.0",
+    }
 
 
 @app.get("/leagues/", response_model=list[LeagueWithTeams])
