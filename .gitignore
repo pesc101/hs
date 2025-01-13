@@ -26,7 +26,6 @@ build/
 .mypy_cache/
 .dmypy.json
 .dmypy/
-.vscode/
 .idea/
 *.iml
 *.sublime-project
