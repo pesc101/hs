@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Run FastAPI with Uvicorn",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/.venv/bin/uvicorn",
             "args": [
