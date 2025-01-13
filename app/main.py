@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .db import SessionLocal
@@ -9,6 +10,15 @@ from .models import GameDetails, League, Team
 from .py_models import GameDetailsBase, LeagueBase, LeagueWithTeams, TeamBase
 
 app = FastAPI()
+
+# CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8080"],  # Allow the Vue app (localhost:8080)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 
 def get_db():
